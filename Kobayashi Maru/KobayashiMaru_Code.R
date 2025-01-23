@@ -3,7 +3,7 @@
 #By Hasan Abdo
 
 #loading the data set in 
-patient_data <- read.csv("~/Documents/Data Science 2/Kobayashi Maru/study2_n1.csv", header = TRUE)
+patient_data <- read.csv("~/Kobayashi Maru/study2_n1.csv", header = TRUE)
 
 #taking out only the variables of interest 
 library(tidyr)
@@ -349,7 +349,7 @@ T3_treat <- patient_data1_cohA %>%
     t3rp == 1 & t3rt == 1 & t3ADT == 1 ~ "RP + RT + ADT",
     t3rp == 0 & t3rt == 0 & t3ADT == 0 ~ "No treatment"))
 
-# Creating bar plot for T3
+#Creating bar plot for T3
 ggplot(T3_treat, aes(x = TreatmentGroup)) +
   geom_bar(fill = "skyblue", color = "black") +
   labs(title = "Distribution of Treatment Combinations at T3 (1 Year)", 
@@ -415,7 +415,7 @@ count_data <- EQTOT_arranged %>%
 ggplot(EQTOT_arranged, aes(x = time, y = EQTOT, fill = TreatmentGroup)) +
   geom_boxplot(outlier.colour = "red", outlier.shape = 16, outlier.size = 2) +
   geom_text(data = count_data, aes(x = time, y = max(EQTOT_arranged$EQTOT) + 0.05, label = paste0("n = ", n)), 
-            position = position_dodge(width = 0.75), vjust = -0.5) +  # Add counts with "n = " label
+            position = position_dodge(width = 0.75), vjust = -0.5) +  
   labs(title = "EQTOT Scores by Treatment Group and Time", 
        x = "Time (T1: Baseline, T2: 3 Months, T3: 1 Year)", 
        y = "EQTOT (Health Utility Score)", 
@@ -446,7 +446,7 @@ count_data1 <- EQTOT_arranged1 %>%
 ggplot(EQTOT_arranged1, aes(x = time, y = EQTOT, fill = TreatmentGroup)) +
   geom_boxplot(outlier.colour = "red", outlier.shape = 16, outlier.size = 2) +
   geom_text(data = count_data1, aes(x = time, y = max(EQTOT_arranged1$EQTOT) + 0.05, label = paste0("n = ", n)), 
-            position = position_dodge(width = 0.75), vjust = -0.5) +  # Add counts with "n = " label
+            position = position_dodge(width = 0.75), vjust = -0.5) + 
   labs(title = "EQTOT Scores by Treatment Group and Time", 
        x = "Time (T1: Baseline, T2: 3 Months, T3: 1 Year)", 
        y = "EQTOT (Health Utility Score)", 
@@ -457,36 +457,36 @@ ggplot(EQTOT_arranged1, aes(x = time, y = EQTOT, fill = TreatmentGroup)) +
 #summary table:
 library(gtsummary)
 
-# Recode categorical variables inside the summary_data data frame
+#Recode categorical variables inside the summary_data data frame
 summary_data <- patient_data1_combined1 %>%
   select(AGE, Treatment, EQTOT, DIABET, KIDNEY, SPBONE, heart, arthritis, time) %>%
   mutate(
-    # Recode Diabetes
+    #Recode Diabetes
     DIABET = factor(DIABET, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Kidney Problems
+    #Recode Kidney Problems
     KIDNEY = factor(KIDNEY, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Tumor Spread to Bones
+    #Recode Tumor Spread to Bones
     SPBONE = factor(SPBONE, levels = c(0, 1, 2), labels = c("No", "Yes", "Not Sure")),
     
-    # Recode Heart Problems
+    #Recode Heart Problems
     heart = factor(heart, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Arthritis
+    #Recode Arthritis
     arthritis = factor(arthritis, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Treatment already recoded in previous steps
+    #Treatment already recoded in previous steps
     Treatment = factor(Treatment)
   )
 
-# Create the summary table using gtsummary
+#Create the summary table using gtsummary
 summary_table <- summary_data %>%
   tbl_summary(
-    by = time,  # Grouping by the time variable (T1: Baseline, T2: 3 Months, T3: 1 Year)
+    by = time,  
     statistic = list(
-      all_continuous() ~ "{median} ({p25}, {p75})",  # Median and interquartile range for continuous variables
-      all_categorical() ~ "{n} ({p}%)"               # Count and percentage for categorical variables (n (%))
+      all_continuous() ~ "{median} ({p25}, {p75})",  
+      all_categorical() ~ "{n} ({p}%)"               
     ),
     label = list(
       AGE ~ "Age",
@@ -498,55 +498,54 @@ summary_table <- summary_data %>%
       heart ~ "Heart Problems",
       arthritis ~ "Arthritis"
     ),
-    missing = "no"  # Exclude missing values from the summary
+    missing = "no" 
   ) %>%
-  add_stat_label() %>%  # Adds a "Statistic" column
+  add_stat_label() %>%  
   modify_header(
-    label = "**Variable**",       # Keep only the variable name in this column
-    stat_label = "**Statistic**",  # The column that describes the statistic (Median, Count, etc.)
-    stat_1 = "**Baseline**",       # Rename for time == 1
-    stat_2 = "**3 Months**",       # Rename for time == 2
-    stat_3 = "**1 Year**"          # Rename for time == 3
+    label = "**Variable**",       
+    stat_label = "**Statistic**",  
+    stat_1 = "**Baseline**",       
+    stat_2 = "**3 Months**",       
+    stat_3 = "**1 Year**"          
   ) %>%
-  modify_spanning_header(c(stat_1, stat_2, stat_3) ~ "Timepoints") %>%  # Optional: Add a spanning header
+  modify_spanning_header(c(stat_1, stat_2, stat_3) ~ "Timepoints") %>%  
   modify_footnote(everything() ~ NA)
 
-# Display the summary table
+#Display the summary table
 summary_table
 
 
-# Recode categorical variables inside the summary_data data frame (non-filtered)
+#Recode categorical variables inside the summary_data data frame (non-filtered)
 summary_data_non_filtered <- patient_data1_combined %>%
   select(AGE, Treatment, EQTOT, DIABET, KIDNEY, SPBONE, heart, arthritis, time) %>%
   mutate(
-    # Recode Diabetes
+    #Recode Diabetes
     DIABET = factor(DIABET, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Kidney Problems
+    #Recode Kidney Problems
     KIDNEY = factor(KIDNEY, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Tumor Spread to Bones
+    #Recode Tumor Spread to Bones
     SPBONE = factor(SPBONE, levels = c(0, 1, 2), labels = c("No", "Yes", "Not Sure")),
     
-    # Recode Heart Problems
+    #Recode Heart Problems
     heart = factor(heart, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Recode Arthritis
+    #Recode Arthritis
     arthritis = factor(arthritis, levels = c(0, 1, 2, 3), labels = c("No", "Yes (Past)", "Yes (Now)", "Not Sure")),
     
-    # Treatment already recoded in previous steps
+    #Treatment already recoded in previous steps
     Treatment = factor(Treatment)
   )
 
-# Create the summary table using gtsummary for the non-filtered data
+#Create the summary table using gtsummary for the non-filtered data
 summary_table_non_filtered <- summary_data_non_filtered %>%
   tbl_summary(
-    by = time,  # Grouping by the time variable (T1: Baseline, T2: 3 Months, T3: 1 Year)
+    by = time,  
     statistic = list(
-      all_continuous() ~ "{median} ({p25}, {p75})",  # Median and interquartile range for continuous variables
-      all_categorical() ~ "{n} ({p}%)"               # Count and percentage for categorical variables (n (%))
+      all_continuous() ~ "{median} ({p25}, {p75})",  
+      all_categorical() ~ "{n} ({p}%)"             
     ),
-    # Correctly matching the variables from the dataset to the labels
     label = list(
       AGE ~ "Age",
       Treatment ~ "Treatment",
@@ -557,46 +556,45 @@ summary_table_non_filtered <- summary_data_non_filtered %>%
       heart ~ "Heart Problems",
       arthritis ~ "Arthritis"
     ),
-    missing = "no"  # Exclude missing values from the summary
+    missing = "no"  
   ) %>%
-  add_stat_label() %>%  # Adds a "Statistic" column for the type of statistic
+  add_stat_label() %>%  
   modify_header(
-    label = "**Variable**",       # Only show variable names in the "Variable" column
-    stat_label = "**Statistic**",  # The column that describes the statistic (Median, Count, etc.)
-    stat_1 = "**Baseline**",       # Rename for time == 1 to "Baseline"
-    stat_2 = "**3 Months**",       # Rename for time == 2 to "3 Months"
-    stat_3 = "**1 Year**"          # Rename for time == 3 to "1 Year"
+    label = "**Variable**",      
+    stat_label = "**Statistic**", 
+    stat_1 = "**Baseline**",      
+    stat_2 = "**3 Months**",       
+    stat_3 = "**1 Year**"         
   ) %>%
-  modify_spanning_header(c(stat_1, stat_2, stat_3) ~ "Timepoints") %>%  # Add the spanning header for Timepoints
+  modify_spanning_header(c(stat_1, stat_2, stat_3) ~ "Timepoints") %>%  
   modify_footnote(everything() ~ NA) 
 
-
 summary_table_non_filtered %>%
-  as_gt() %>%  # Convert to gt table
+  as_gt() %>%  
   gt::tab_options(
-    table.font.size = "small"  # Adjust font size to smaller
+    table.font.size = "small"  
   )
-# Display the summary table for non-filtered data
+
 summary_table_non_filtered
 
 
 
 
-# Create histogram for AGE (continuous variable) over time
+#Create histogram for AGE (continuous variable) over time
 ggplot(summary_data_non_filtered, aes(x = AGE)) +
   geom_histogram(binwidth = 5, color = "black", fill = "skyblue", alpha = 0.7) +
   labs(title = "Distribution of Age", x = "Age", y = "Number of Patients") +
   theme_minimal() +
   xlim(0,100)
 
-# Create histogram for EQTOT (continuous variable) over time with modified time labels
+#Create histogram for EQTOT (continuous variable) over time with modified time labels
 ggplot(summary_data_non_filtered, aes(x = EQTOT, fill = time)) +
   geom_histogram(binwidth = 0.05, color = "black", alpha = 0.7) +
-  labs(title = "Distribution of EQTOT Scores by Timepoint", x = "EQTOT Score", y = "Number of Patients", fill = "Timepoint") +  # Rename legend to "Timepoint"
-  facet_wrap(~ time, ncol = 1) +  # Separate plots for each time point
+  labs(title = "Distribution of EQTOT Scores by Timepoint", x = "EQTOT Score", y = "Number of Patients", fill = "Timepoint") +  
+  facet_wrap(~ time, ncol = 1) +  
   theme_minimal()
 
-# Barplot for Treatment distribution over time
+#Barplot for Treatment distribution over time
 ggplot(summary_data_non_filtered, aes(x = Treatment, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
@@ -605,36 +603,37 @@ ggplot(summary_data_non_filtered, aes(x = Treatment, fill = time)) +
        x = "Treatment Type", y = "Number of Patients", fill = "Timepoint") +
   theme_minimal() +
   theme(
-    axis.title.x = element_text(size = 16),  # Increase x-axis title size
-    axis.title.y = element_text(size = 16),  # Increase y-axis title size
-    axis.text.x = element_text(size = 14),   # Increase x-axis labels size
-    axis.text.y = element_text(size = 14),   # Increase y-axis labels size
-    legend.title = element_text(size = 14),  # Increase legend title size
-    legend.text = element_text(size = 12),   # Increase legend text size
-    plot.title = element_text(size = 18, hjust = 0.5)  # Increase plot title size and center it
+    axis.title.x = element_text(size = 16), 
+    axis.title.y = element_text(size = 16),  
+    axis.text.x = element_text(size = 14),   
+    axis.text.y = element_text(size = 14),   
+    legend.title = element_text(size = 14), 
+    legend.text = element_text(size = 12), 
+    plot.title = element_text(size = 18, hjust = 0.5)  
   )
+
 ###EQTOT PLOTS DISTRIBUTION ####
 #Histogram for EQTOT at Time 2 (3 Months) with y-axis limit
 ggplot(patient_data1_combined1 %>% filter(time == 2), aes(x = EQTOT)) +
-  geom_histogram(bins = 15, fill = "skyblue", color = "black", alpha = 0.7) +  # Set number of bins to 30
+  geom_histogram(bins = 15, fill = "skyblue", color = "black", alpha = 0.7) +  
   labs(title = "Distribution of EQTOT Scores at 3 Months (Time 2)", 
        x = "EQTOT Score", 
        y = "Number of Patients") +
-  ylim(0, 60) +  # Keep y-axis limit at 60
+  ylim(0, 60) +  
   theme_minimal()
 
-# Histogram for EQTOT at Time 3 (1 Year) without x-axis limit
+#Histogram for EQTOT at Time 3 (1 Year) without x-axis limit
 ggplot(patient_data1_combined1 %>% filter(time == 3), aes(x = EQTOT)) +
-  geom_histogram(bins = 15, fill = "lightcoral", color = "black", alpha = 0.7) +  # Set number of bins to 30
+  geom_histogram(bins = 15, fill = "lightcoral", color = "black", alpha = 0.7) +  
   labs(title = "Distribution of EQTOT Scores at 1 Year (Time 3)", 
        x = "EQTOT Score", 
        y = "Number of Patients") +
-  ylim(0, 60) +  # Keep y-axis limit at 60
+  ylim(0, 60) +  
   theme_minimal()
 
 
 
-# Barplot for DIABET (Diabetes) with n labels
+#Barplot for DIABET (Diabetes) with n labels
 ggplot(summary_data_non_filtered, aes(x = DIABET, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
@@ -643,7 +642,7 @@ ggplot(summary_data_non_filtered, aes(x = DIABET, fill = time)) +
        x = "Diabetes Status", y = "Number of Patients", fill = "Timepoint") +
   theme_minimal()
 
-# Barplot for KIDNEY problems with n labels
+#Barplot for KIDNEY problems with n labels
 ggplot(summary_data_non_filtered, aes(x = KIDNEY, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
@@ -652,7 +651,7 @@ ggplot(summary_data_non_filtered, aes(x = KIDNEY, fill = time)) +
        x = "Kidney Status", y = "Number of Patients", fill = "Timepoint") +
   theme_minimal()
 
-# Barplot for SPBONE (Tumor spread to bones) with n labels
+#Barplot for SPBONE (Tumor spread to bones) with n labels
 ggplot(summary_data_non_filtered, aes(x = SPBONE, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
@@ -661,7 +660,7 @@ ggplot(summary_data_non_filtered, aes(x = SPBONE, fill = time)) +
        x = "Tumor Spread to Bones", y = "Number of Patients", fill = "Timepoint") +
   theme_minimal()
 
-# Barplot for heart problems with n labels
+#Barplot for heart problems with n labels
 ggplot(summary_data_non_filtered, aes(x = heart, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
@@ -670,7 +669,7 @@ ggplot(summary_data_non_filtered, aes(x = heart, fill = time)) +
        x = "Heart Problems", y = "Number of Patients", fill = "Timepoint") +
   theme_minimal()
 
-# Barplot for arthritis with n labels
+#Barplot for arthritis with n labels
 ggplot(summary_data_non_filtered, aes(x = arthritis, fill = time)) +
   geom_bar(color = "black", alpha = 0.7, position = "dodge") +
   stat_count(aes(label = paste0("n = ", ..count..)), geom = "text", 
